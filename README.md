@@ -1,4 +1,4 @@
-# vue-query-state
+# vue-url-state
 
 A Vue 3 composable for syncing reactive state with URL query parameters. Automatically keeps your component state in sync with the URL, making it perfect for search filters, pagination, tabs, and other stateful UI components that should be bookmarkable and shareable.
 
@@ -15,7 +15,7 @@ A Vue 3 composable for syncing reactive state with URL query parameters. Automat
 ## Installation
 
 ```bash
-npm install vue-query-state
+npm install vue-url-state
 ```
 
 ## Basic Usage
@@ -29,7 +29,7 @@ npm install vue-query-state
 </template>
 
 <script setup>
-import { useQueryState } from 'vue-query-state'
+import { useQueryState } from 'vue-url-state'
 
 // Syncs with ?search=... in URL
 const searchTerm = useQueryState('search', '')
@@ -53,7 +53,7 @@ The composable automatically handles type conversion for:
 
 ```vue
 <script setup>
-import { useQueryState } from 'vue-query-state'
+import { useQueryState } from 'vue-url-state'
 
 const searchTerm = useQueryState('q', '', {
   debounce: 300 // Wait 300ms before updating URL
@@ -65,7 +65,7 @@ const searchTerm = useQueryState('q', '', {
 
 ```vue
 <script setup>
-import { useQueryState } from 'vue-query-state'
+import { useQueryState } from 'vue-url-state'
 
 const currentPage = useQueryState('page', 1)
 const pageSize = useQueryState('size', 10)
@@ -76,7 +76,7 @@ const pageSize = useQueryState('size', 10)
 
 ```vue
 <script setup>
-import { useQueryState } from 'vue-query-state'
+import { useQueryState } from 'vue-url-state'
 
 const selectedTags = useQueryState('tags', [])
 const selectedIds = useQueryState('ids', [0]) // Array of numbers
@@ -87,7 +87,7 @@ const selectedIds = useQueryState('ids', [0]) // Array of numbers
 
 ```vue
 <script setup>
-import { useQueryState } from 'vue-query-state'
+import { useQueryState } from 'vue-url-state'
 
 const showAdvanced = useQueryState('advanced', false)
 const isPublished = useQueryState('published', true)
@@ -98,7 +98,7 @@ const isPublished = useQueryState('published', true)
 
 ```vue
 <script setup>
-import { useQueryState } from 'vue-query-state'
+import { useQueryState } from 'vue-url-state'
 
 // Default: adds to browser history
 const searchTerm = useQueryState('search', '')
@@ -116,7 +116,7 @@ const filterTerm = useQueryState('filter', '', {
 
 ```vue
 <script setup>
-import { useQueryState } from 'vue-query-state'
+import { useQueryState } from 'vue-url-state'
 
 // Custom date handling
 const selectedDate = useQueryState('date', new Date(), {
@@ -163,7 +163,7 @@ const userPrefs = useQueryState('prefs', { theme: 'light', lang: 'en' }, {
 </template>
 
 <script setup>
-import { useQueryState } from 'vue-query-state'
+import { useQueryState } from 'vue-url-state'
 
 const searchTerm = useQueryState('q', '', { debounce: 300 })
 const category = useQueryState('category', '')
