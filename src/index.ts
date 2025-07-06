@@ -128,4 +128,4 @@ function defaultSerializer<T extends SupportedType>(defaultVal: T) {
 }
 
 // Export types for consumers
-export type { SupportedType, UseQueryStateOptions };
+export type { SupportedType, UseQueryStateOptions, defaultSerializer };
