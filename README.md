@@ -163,7 +163,7 @@ const userPrefs = useQueryState('prefs', { theme: 'light', lang: 'en' }, {
 </template>
 
 <script setup>
-import { useQueryState } from 'vue-url-state'
+import { useQueryState } from 'vue-query-state'
 
 const searchTerm = useQueryState('q', '', { debounce: 300 })
 const category = useQueryState('category', '')
@@ -172,6 +172,50 @@ const minPrice = useQueryState('min', 0)
 const maxPrice = useQueryState('max', 1000)
 const currentPage = useQueryState('page', 1)
 </script>
+```
+
+## API Reference
+
+### `useQueryState(key, defaultValue, options)`
+
+Main composable function for syncing state with URL query parameters.
+
+**Parameters:**
+- `key` - The query parameter key
+- `defaultValue` - Default value and type inference
+- `options` - Configuration options
+
+**Returns:** `Ref<T>` - Reactive reference synced with URL
+
+### `defaultParser(defaultValue)`
+
+Utility function that creates a default parser based on the default value type.
+
+```javascript
+import { defaultParser, defaultSerializer } from 'vue-url-state'
+
+const customParser = defaultParser('') // Creates a string parser
+const result = customParser('hello') // Returns 'hello'
+```
+
+### `defaultSerializer(defaultValue)`
+
+Utility function that creates a default serializer based on the default value type.
+
+```javascript
+import { defaultSerializer } from 'vue-url-state'
+
+const customSerializer = defaultSerializer('')
+const result = customSerializer('hello') // Returns 'hello'
+```
+
+### Types
+
+```typescript
+import type { SupportedType, UseQueryStateOptions } from 'vue-url-state'
+
+// SupportedType = string | number | boolean | string[] | number[] | null
+// UseQueryStateOptions<T> = { parse?, serialize?, replace?, debounce? }
 ```
 
 ## Options
