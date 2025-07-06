@@ -21,7 +21,7 @@
     "state",
     "router"
   ],
-  "author": "Your Name <your.email@example.com>",
+  "author": "Sanjiv Chaudhary sanjivchaudhary415@gmail.com",
   "license": "MIT",
   "devDependencies": {
     "typescript": "^5.1.3"
@@ -29,5 +29,13 @@
   "peerDependencies": {
     "vue": "^3.0.0",
     "vue-router": "^4.0.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sanjivchy/vue-url-state.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Sanjivchy/vue-url-state/issues"
+  },
+  "homepage": "https://github.com/Sanjivchy/vue-url-state#readme"
 }
