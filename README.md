@@ -1,167 +1,204 @@
-# vue-url-state
+# vue-query-state
 
-> A Vue 3 composable to sync reactive state with the URL query string. Ideal for filters, pagination, tabs, or any state you want reflected in the URL.
+A Vue 3 composable for syncing reactive state with URL query parameters. Automatically keeps your component state in sync with the URL, making it perfect for search filters, pagination, tabs, and other stateful UI components that should be bookmarkable and shareable.
 
-[![npm version](https://badge.fury.io/js/vue-url-state.svg)](https://www.npmjs.com/package/vue-url-state)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+## Features
 
----
+- 🔄 **Bidirectional sync** - Component state ↔ URL query parameters
+- 🎯 **Type-safe** - Full TypeScript support with proper type inference
+- 🚀 **Vue 3 + Vue Router 4** - Built specifically for the modern Vue ecosystem
+- 🎛️ **Flexible parsing** - Supports strings, numbers, booleans, and arrays
+- ⚡ **Debounced updates** - Prevents excessive URL updates
+- 🔧 **Customizable** - Custom parsers and serializers for complex data types
+- 📦 **Lightweight** - Zero dependencies beyond Vue ecosystem
 
-## ✨ Features
-
-- 🔁 Bi-directional sync between query params and Vue state
-- 🎯 Supports strings, numbers, booleans, and arrays
-- 🧩 Custom `parse` and `serialize` support
-- ⏱ Optional debounce
-- 🛠 Built with TypeScript
-
----
-
-## 📦 Installation
+## Installation
 
 ```bash
-npm install vue-url-state
+npm install vue-query-state
 ```
 
-> Requires Vue 3 and Vue Router 4
+## Basic Usage
 
----
+```vue
+<template>
+  <div>
+    <input v-model="searchTerm" placeholder="Search..." />
+    <p>Search term: {{ searchTerm }}</p>
+  </div>
+</template>
 
-## 🚀 Basic Usage
+<script setup>
+import { useQueryState } from 'vue-query-state'
 
-```ts
-import { useQueryState } from 'vue-url-state'
-
-const search = useQueryState('search', '', { debounce: 300 })
-const page = useQueryState('page', 1)
+// Syncs with ?search=... in URL
+const searchTerm = useQueryState('search', '')
+</script>
 ```
 
-When `search.value` or `page.value` changes, the URL updates:
+## Supported Types
 
-```
-?search=vue&page=1
-```
+The composable automatically handles type conversion for:
 
-When the URL changes manually or via navigation, the state updates as well.
+- `string` - Direct string values
+- `number` - Parsed from string to number
+- `boolean` - 'true'/'false' string conversion
+- `string[]` - Array of strings
+- `number[]` - Array of numbers parsed from strings
+- `null` - Removes parameter from URL when null
 
----
+## Examples
 
-## ✅ Inside setup()
+### Search with Debouncing
 
-```ts
-setup() {
-  const tags = useQueryState<string[]>('tags', [])
-  const sort = useQueryState('sort', 'recent')
+```vue
+<script setup>
+import { useQueryState } from 'vue-query-state'
 
-  return { tags, sort }
-}
-```
-
-This syncs your component state with the URL query:
-
-```
-?tags=vue&tags=js&sort=recent
-```
-
----
-
-## ⚙️ Options
-
-You can pass an options object as the third argument:
-
-```ts
-useQueryState('key', defaultValue, {
-  parse: (val) => ...,        // optional parse function
-  serialize: (val) => ...,    // optional serialize function
-  replace: true,              // use router.replace() instead of push()
-  debounce: 300               // debounce time in ms
+const searchTerm = useQueryState('q', '', {
+  debounce: 300 // Wait 300ms before updating URL
 })
+</script>
 ```
 
-### Available Options
+### Pagination
 
-| Option      | Type                                              | Description                                                   |
-|-------------|---------------------------------------------------|---------------------------------------------------------------|
-| `parse`     | `(val: string \| string[] \| null \| undefined) => T` | Function to convert the query param into your value type    |
-| `serialize` | `(val: T) => string \| string[] \| null`           | Function to convert your value to query param format         |
-| `replace`   | `boolean`                                         | Use `router.replace()` instead of `router.push()`            |
-| `debounce`  | `number` (ms)                                     | Debounce the router update by X milliseconds                 |
+```vue
+<script setup>
+import { useQueryState } from 'vue-query-state'
 
----
+const currentPage = useQueryState('page', 1)
+const pageSize = useQueryState('size', 10)
+</script>
+```
 
-## 🔧 Custom Serialization Example
+### Filters with Arrays
 
-```ts
-const range = useQueryState<[number, number]>('range', [0, 100], {
+```vue
+<script setup>
+import { useQueryState } from 'vue-query-state'
+
+const selectedTags = useQueryState('tags', [])
+const selectedIds = useQueryState('ids', [0]) // Array of numbers
+</script>
+```
+
+### Boolean Toggles
+
+```vue
+<script setup>
+import { useQueryState } from 'vue-query-state'
+
+const showAdvanced = useQueryState('advanced', false)
+const isPublished = useQueryState('published', true)
+</script>
+```
+
+### Replace vs Push Navigation
+
+```vue
+<script setup>
+import { useQueryState } from 'vue-query-state'
+
+// Default: adds to browser history
+const searchTerm = useQueryState('search', '')
+
+// Replace: replaces current history entry
+const filterTerm = useQueryState('filter', '', {
+  replace: true
+})
+</script>
+```
+
+## Advanced Usage
+
+### Custom Parsers and Serializers
+
+```vue
+<script setup>
+import { useQueryState } from 'vue-query-state'
+
+// Custom date handling
+const selectedDate = useQueryState('date', new Date(), {
+  parse: (val) => val ? new Date(val) : new Date(),
+  serialize: (date) => date.toISOString().split('T')[0]
+})
+
+// Custom object handling
+const userPrefs = useQueryState('prefs', { theme: 'light', lang: 'en' }, {
   parse: (val) => {
-    const [min, max] = (val as string)?.split('-').map(Number) ?? []
-    return [min || 0, max || 100]
+    try {
+      return val ? JSON.parse(val) : { theme: 'light', lang: 'en' }
+    } catch {
+      return { theme: 'light', lang: 'en' }
+    }
   },
-  serialize: (val) => `${val[0]}-${val[1]}`
+  serialize: (obj) => JSON.stringify(obj)
 })
+</script>
 ```
 
-This will sync with:
+### Complete Search Example
 
-```
-?range=10-50
-```
+```vue
+<template>
+  <div>
+    <input v-model="searchTerm" placeholder="Search..." />
+    <select v-model="category">
+      <option value="">All Categories</option>
+      <option value="posts">Posts</option>
+      <option value="users">Users</option>
+    </select>
+    <label>
+      <input v-model="showAdvanced" type="checkbox" />
+      Show Advanced Options
+    </label>
+    <div v-if="showAdvanced">
+      <input v-model="minPrice" type="number" placeholder="Min Price" />
+      <input v-model="maxPrice" type="number" placeholder="Max Price" />
+    </div>
+    <button @click="currentPage = 1">Reset Page</button>
+    <div>Page: {{ currentPage }}</div>
+  </div>
+</template>
 
----
+<script setup>
+import { useQueryState } from 'vue-query-state'
 
-## 🧪 TypeScript Support
-
-The `useQueryState` composable is fully typed. The return type is automatically inferred from the `defaultValue` you provide.
-
----
-
-## 📁 Project Structure
-
-```
-vue-url-state/
-├── src/
-│   └── index.ts       # Main composable
-├── dist/              # Compiled output (after build)
-├── package.json
-├── tsconfig.json
-└── README.md
-```
-
----
-
-## 🛠 Local Development
-
-To test the package locally before publishing:
-
-```bash
-# Link this package locally
-npm link
-
-# Then in another Vue project
-npm link vue-url-state
+const searchTerm = useQueryState('q', '', { debounce: 300 })
+const category = useQueryState('category', '')
+const showAdvanced = useQueryState('advanced', false)
+const minPrice = useQueryState('min', 0)
+const maxPrice = useQueryState('max', 1000)
+const currentPage = useQueryState('page', 1)
+</script>
 ```
 
-To build:
+## Options
 
-```bash
-npm run build
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `parse` | `(val: string \| string[] \| null \| undefined) => T` | Auto-generated | Custom parser for converting URL values to your type |
+| `serialize` | `(val: T) => string \| string[] \| null` | Auto-generated | Custom serializer for converting your type to URL values |
+| `replace` | `boolean` | `false` | Use `router.replace()` instead of `router.push()` |
+| `debounce` | `number` | `0` | Debounce delay in milliseconds before updating URL |
+
+## Type Safety
+
+The composable provides full TypeScript support with automatic type inference:
+
+```typescript
+const searchTerm = useQueryState('search', '') // Ref<string>
+const count = useQueryState('count', 0) // Ref<number>
+const isActive = useQueryState('active', false) // Ref<boolean>
+const tags = useQueryState('tags', ['']) // Ref<string[]>
+const ids = useQueryState('ids', [0]) // Ref<number[]>
 ```
 
----
+## License
 
-## 📜 License
+MIT
 
-MIT © Your Name
+## Contributing
 
----
-
-## 🙋‍♀️ Contributing
-
-Pull requests, issues, and feedback are welcome! Let’s improve this together.
-
----
-
-## 🔗 Related Links
-
-- [Vue 3 Documentation](https://vuejs.org)
-- [Vue Router](https://router.vuejs.org)
+Contributions are welcome! Please feel free to submit a Pull Request.

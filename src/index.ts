@@ -1,8 +1,10 @@
 import { ref, watch, onMounted, type Ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
+// Supported query value types
 type SupportedType = string | number | boolean | string[] | number[] | null;
 
+// Options interface
 interface UseQueryStateOptions<T extends SupportedType> {
   parse?: (val: string | string[] | null | undefined) => T;
   serialize?: (val: T) => string | string[] | null;
@@ -10,17 +12,20 @@ interface UseQueryStateOptions<T extends SupportedType> {
   debounce?: number;
 }
 
-// Custom debounce helper
-function debounce<F extends (...args: any[]) => void>(fn: F, delay: number): F {
+// Type-safe custom debounce function
+function debounce<T extends (...args: Parameters<T>) => ReturnType<T>>(
+  fn: T,
+  delay: number
+): (...args: Parameters<T>) => void {
   let timer: ReturnType<typeof setTimeout> | null = null;
-  return function (this: any, ...args: Parameters<F>) {
+
+  return (...args: Parameters<T>): void => {
     if (timer) clearTimeout(timer);
-    timer = setTimeout(() => {
-      fn.apply(this, args);
-    }, delay);
-  } as F;
+    timer = setTimeout(() => fn(...args), delay);
+  };
 }
 
+// Main composable
 export function useQueryState<T extends SupportedType>(
   key: string,
   defaultValue: T,
@@ -40,11 +45,12 @@ export function useQueryState<T extends SupportedType>(
     const query = { ...route.query };
     const serialized = serialize(val);
 
-    if (
+    const isEmpty =
       serialized === null ||
       (Array.isArray(serialized) && serialized.length === 0) ||
-      (typeof serialized === "string" && serialized.trim() === "")
-    ) {
+      (typeof serialized === "string" && serialized.trim() === "");
+
+    if (isEmpty) {
       delete query[key];
     } else {
       query[key] = serialized;
@@ -53,9 +59,8 @@ export function useQueryState<T extends SupportedType>(
     router[replace ? "replace" : "push"]({ query }).catch(() => {});
   };
 
-  const updateQuery = debounceDelay
-    ? debounce(syncQuery, debounceDelay)
-    : syncQuery;
+  const updateQuery =
+    debounceDelay > 0 ? debounce(syncQuery, debounceDelay) : syncQuery;
 
   onMounted(() => {
     const raw = route.query[key];
@@ -82,6 +87,7 @@ export function useQueryState<T extends SupportedType>(
   return state;
 }
 
+// Default parser
 function defaultParser<T extends SupportedType>(defaultVal: T) {
   return (val: string | string[] | null | undefined): T => {
     if (val === undefined || val === null) return defaultVal;
@@ -108,6 +114,7 @@ function defaultParser<T extends SupportedType>(defaultVal: T) {
   };
 }
 
+// Default serializer
 function defaultSerializer<T extends SupportedType>(defaultVal: T) {
   return (val: T): string | string[] | null => {
     if (val === defaultVal) return null;
@@ -119,3 +126,6 @@ function defaultSerializer<T extends SupportedType>(defaultVal: T) {
     return null;
   };
 }
+
+// Export types for consumers
+export type { SupportedType, UseQueryStateOptions };
