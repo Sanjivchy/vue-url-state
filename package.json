@@ -1,6 +1,6 @@
 {
   "name": "vue-url-state",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A Vue 3 composable to sync reactive state with URL query parameters, supporting parsing, serialization, and debounce.",
   "types": "dist/index.d.ts",
   "main": "dist/index.js",
