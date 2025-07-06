@@ -3,7 +3,7 @@
   "version": "0.1.3",
   "description": "A Vue 3 composable to sync reactive state with URL query parameters, supporting parsing, serialization, and debounce.",
   "main": "dist/index.js",
-  "module": "dist/index.es.js",
+  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "files": [
     "dist"
@@ -37,5 +37,11 @@
   "bugs": {
     "url": "https://github.com/Sanjivchy/vue-url-state/issues"
   },
-  "homepage": "https://github.com/Sanjivchy/vue-url-state#readme"
+  "homepage": "https://github.com/Sanjivchy/vue-url-state#readme",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  }
 }
