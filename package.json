@@ -1,6 +1,6 @@
 {
   "name": "vue-url-state",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A Vue 3 composable for syncing reactive state with URL query parameters",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
