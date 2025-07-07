@@ -1,5 +1,11 @@
 # vue-url-state
 
+<!-- Badges -->
+<p align="left">
+  <a href="https://www.npmjs.com/package/vue-url-state"><img src="https://img.shields.io/npm/v/vue-url-state.svg" alt="npm version"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License"></a>
+</p>
+
 A Vue 3 composable for syncing reactive state with URL query parameters. Automatically keeps your component state in sync with the URL, making it perfect for search filters, pagination, tabs, and other stateful UI components that should be bookmarkable and shareable.
 
 ## Features
@@ -10,7 +16,30 @@ A Vue 3 composable for syncing reactive state with URL query parameters. Automat
 - 🎛️ **Flexible parsing** - Supports strings, numbers, booleans, and arrays
 - ⚡ **Debounced updates** - Prevents excessive URL updates
 - 🔧 **Customizable** - Custom parsers and serializers for complex data types
-- 📦 **Lightweight** - Zero dependencies beyond Vue ecosystem
+- 📦 **Lightweight** - Zero dependencies beyond the Vue ecosystem
+
+## Requirements
+
+- **Vue 3.x**
+- **Vue Router 4.x** (required: this composable will not work without Vue Router)
+
+## Table of Contents
+
+- [Demo](#demo)
+- [Installation](#installation)
+- [Basic Usage](#basic-usage)
+- [Supported Types](#supported-types)
+- [Examples](#examples)
+- [Advanced Usage](#advanced-usage)
+- [API Reference](#api-reference)
+- [Options](#options)
+- [Type Safety](#type-safety)
+- [License](#license)
+- [Contributing](#contributing)
+
+## Demo
+
+Try it live on CodeSandbox: [vue-url-state Demo](https://codesandbox.io/p/devbox/q57slz?file=%2Fsrc%2Frouter%2Findex.tsx%3A14%2C21)
 
 ## Installation
 
@@ -245,4 +274,6 @@ MIT
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please feel free to submit a pull request or open an issue if you have suggestions, bug reports, or feature requests. For major changes, please open an issue first to discuss what you would like to change.
+
+If you have questions or need help, feel free to reach out!
