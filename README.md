@@ -163,7 +163,7 @@ const userPrefs = useQueryState('prefs', { theme: 'light', lang: 'en' }, {
 </template>
 
 <script setup>
-import { useQueryState } from 'vue-query-state'
+import { useQueryState } from 'vue-url-state'
 
 const searchTerm = useQueryState('q', '', { debounce: 300 })
 const category = useQueryState('category', '')
