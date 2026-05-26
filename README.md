@@ -17,14 +17,36 @@ A Vue 3 composable for syncing reactive state with URL query parameters. Automat
 - ⚡ **Debounced updates** - Prevents excessive URL updates
 - 🔧 **Customizable** - Custom parsers and serializers for complex data types
 - 📦 **Lightweight** - Zero dependencies beyond the Vue ecosystem
+- 🪄 **No initial flash** - State is read synchronously during `setup`
+- 🧯 **Race-safe** - Simultaneous updates to multiple keys are batched into a single navigation
+- 🧹 **Auto cleanup** - Pending debounced writes are cancelled on unmount
 
 ## Requirements
 
 - **Vue 3.x**
 - **Vue Router 4.x** (required: this composable will not work without Vue Router)
+- **Node.js 18+** (for development)
+
+## What's new in 1.1.0
+
+Bug fixes and hardening. No API removals — existing code keeps working.
+
+- 🪄 **No initial flash** — state is read synchronously during `setup`, not in `onMounted`.
+- 🧯 **Race-safe batching** — multiple `useQueryState` updates in the same tick merge into a single navigation. Previously, simultaneous updates could overwrite each other.
+- 🌊 **Deep watch by default** — array mutations (`push`, `splice`, …) now sync to the URL. Opt out with `{ deep: false }`.
+- 🔁 **No feedback loops** — idempotent writes/parses are skipped, ending the state↔route ping-pong for array types.
+- 🧹 **Pending debounced writes are cancelled on unmount** — no more late navigations from dead components.
+- ✅ **Flexible boolean parsing** — accepts `true/false/1/0/yes/no/on/off` (case-insensitive).
+- 🧮 **NaN-safe number arrays** — `?ids=1&ids=abc` → `[1]` instead of `[1, NaN]`.
+- 🪪 **Clear error when `vue-router` is missing** — no more cryptic `Cannot read property 'query' of undefined`.
+- 📦 **Packaging fixes** — CJS build path now matches the `exports` map, so `require('vue-url-state')` works again. `sideEffects: false` for better tree-shaking.
+- 🧪 **Test suite** — 26 tests covering parsing, two-way sync, batching, deep arrays, and unmount safety.
+
+See [CHANGELOG.md](CHANGELOG.md) for the full migration notes.
 
 ## Table of Contents
 
+- [What's new in 1.1.0](#whats-new-in-110)
 - [Demo](#demo)
 - [Installation](#installation)
 - [Basic Usage](#basic-usage)
@@ -34,6 +56,7 @@ A Vue 3 composable for syncing reactive state with URL query parameters. Automat
 - [API Reference](#api-reference)
 - [Options](#options)
 - [Type Safety](#type-safety)
+- [Changelog](#changelog)
 - [License](#license)
 - [Contributing](#contributing)
 
@@ -107,10 +130,15 @@ const pageSize = useQueryState('size', 10)
 <script setup>
 import { useQueryState } from 'vue-url-state'
 
-const selectedTags = useQueryState('tags', [])
-const selectedIds = useQueryState('ids', [0]) // Array of numbers
+const selectedTags = useQueryState<string[]>('tags', [])
+const selectedIds = useQueryState('ids', [0]) // Array of numbers — non-empty default signals the item type
+
+// Array mutations (push/splice/etc.) are picked up by a deep watcher:
+selectedTags.value.push('vue')
 </script>
 ```
+
+> **Note** — to use a number array, the default must be non-empty (e.g. `[0]`). An empty default `[]` is treated as a string array because there is no runtime way to know the desired item type.
 
 ### Boolean Toggles
 
@@ -255,6 +283,21 @@ import type { SupportedType, UseQueryStateOptions } from 'vue-url-state'
 | `serialize` | `(val: T) => string \| string[] \| null` | Auto-generated | Custom serializer for converting your type to URL values |
 | `replace` | `boolean` | `false` | Use `router.replace()` instead of `router.push()` |
 | `debounce` | `number` | `0` | Debounce delay in milliseconds before updating URL |
+| `deep`     | `boolean` | `true`  | Watch the ref deeply, so array/object mutations are detected |
+
+### Boolean parsing
+
+The default boolean parser accepts a generous set of values, all case-insensitive:
+
+| Truthy | Falsy |
+|--------|-------|
+| `true`, `1`, `yes`, `on` | `false`, `0`, `no`, `off` |
+
+Anything else falls back to the default value.
+
+### Equal-to-default omission
+
+When a value equals the default, the parameter is removed from the URL (keeps URLs clean and shareable). For arrays this comparison is shallow-structural; for primitives it is `===`.
 
 ## Type Safety
 
@@ -267,6 +310,10 @@ const isActive = useQueryState('active', false) // Ref<boolean>
 const tags = useQueryState('tags', ['']) // Ref<string[]>
 const ids = useQueryState('ids', [0]) // Ref<number[]>
 ```
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for release history and migration notes.
 
 ## License
 

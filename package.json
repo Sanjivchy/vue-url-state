@@ -1,16 +1,20 @@
 {
   "name": "vue-url-state",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "description": "A Vue 3 composable for syncing reactive state with URL query parameters",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.cjs"
     }
+  },
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
   },
   "files": [
     "dist",
@@ -21,7 +25,8 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "prepublishOnly": "npm run build",
-    "test": "vitest",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "test:coverage": "vitest --coverage"
   },
   "keywords": [
@@ -51,6 +56,9 @@
   "devDependencies": {
     "@types/node": "^20.19.4",
     "@vitejs/plugin-vue": "^5.0.0",
+    "@vitest/coverage-v8": "^1.6.1",
+    "@vue/test-utils": "^2.4.10",
+    "happy-dom": "^20.9.0",
     "tsup": "^8.0.0",
     "typescript": "^5.0.0",
     "vitest": "^1.0.0",

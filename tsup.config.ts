@@ -10,4 +10,7 @@ export default defineConfig({
   sourcemap: true,
   minify: true,
   treeshake: true,
+  outExtension: ({ format }) => ({
+    js: format === "cjs" ? ".cjs" : ".mjs",
+  }),
 });
